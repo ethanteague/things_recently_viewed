@@ -40,7 +40,7 @@ function things_recently_viewed_block_view($delta = '') {
 function things_recently_viewed_efq() {
   drupal_add_js(drupal_get_path('module', 'things_recently_viewed') . '/assets/quickpager.jquery.js');
   drupal_add_js(drupal_get_path('module', 'things_recently_viewed') . '/assets/pager.js');
-drupal_add_css(drupal_get_path('module', 'things_recently_viewed') . '/assets/things_recently_viewed.css');
+  drupal_add_css(drupal_get_path('module', 'things_recently_viewed') . '/assets/things_recently_viewed.css');
   global $user;
 
   $uid = $user->uid;
@@ -64,42 +64,4 @@ drupal_add_css(drupal_get_path('module', 'things_recently_viewed') . '/assets/th
   }
 
   return $output;
-}
-
-/**
- * Implements hook_admin().
- */
-function things_recently_viewed_admin() {
-  $form = array();
-
-  $form['things_recently_viewed_max'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Maximum number of links'),
-    '#default_value' => variable_get('things_recently_viewed_max', 3),
-    '#size' => 2,
-    '#maxlength' => 2,
-    '#description' => t("The max number of links to display in the block."),
-    '#required' => TRUE,
-  );
-
-  return system_settings_form($form);
-}
-
-/**
- * Implements hook_menu().
- */
-function things_recently_viewed_menu() {
-
-  $items = array();
-
-  $items['admin/settings/things-recently-viewed'] = array(
-    'title' => 'Things Recently Viewed module settings',
-    'description' => 'Config settings for Things Recently Viewed Module',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('things_recently_viewed_admin'),
-    'access arguments' => array('administer onthisdate settings'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  return $items;
 }
