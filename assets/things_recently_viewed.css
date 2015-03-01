@@ -1,0 +1,20 @@
+ul#things-recently-viewed-items {
+  margin-left:0;
+}
+ul#things-recently-viewed-items li {
+  list-style:none;
+}
+ul.simplePagerNav {
+  display:block;
+  height:25px;
+  width:100%;
+  clear:both;
+  margin:5px 0;
+}
+ul.simplePagerNav li {
+  list-style:none;
+  float:left;
+  display:block;
+  padding:5px;
+  margin:2px;
+}

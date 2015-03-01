@@ -1,0 +1,105 @@
+<?php
+
+/**
+ * @file
+ * Module file for recently_viewed.
+ */
+
+/**
+ * Implements hook_block_info().
+ */
+function things_recently_viewed_block_info() {
+
+  $block = array();
+
+  $block['things_recently_viewed'] = array(
+    'info' => t('Shows recently viewed blocks'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $block;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function things_recently_viewed_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'things_recently_viewed':
+      $block['subject'] = t('Recently Viewed');
+      $block['content'] = things_recently_viewed_efq();
+      break;
+
+    default:
+      '';
+  }
+  return $block;
+}
+
+// Grab our user activity.
+function things_recently_viewed_efq() {
+  drupal_add_js(drupal_get_path('module', 'things_recently_viewed') . '/assets/quickpager.jquery.js');
+  drupal_add_js(drupal_get_path('module', 'things_recently_viewed') . '/assets/pager.js');
+drupal_add_css(drupal_get_path('module', 'things_recently_viewed') . '/assets/things_recently_viewed.css');
+  global $user;
+
+  $uid = $user->uid;
+  $query = db_select('node', 'n');
+  $query->join('history', 'h', 'n.nid = h.nid AND h.uid = :uid', array(':uid' => $uid));
+  $query->orderby('timestamp', 'DESC')
+        ->fields('n', array('nid', 'title'))
+        ->fields('h', array('timestamp'))
+        ->range(0, 50);
+  $results = $query->execute()->fetchall();
+
+  $output = '';
+  if (!empty($results)) {
+
+    $output .= '<ul id="things-recently-viewed-items" class="paging">';
+
+    foreach ($results as $item) {
+      $output .= '<li class="things-recently-viewed-items-li">' . l($item->title, 'node/' . $item->nid) . ' - ' . date('Y-m-d H:i:s', $item->timestamp) . '</li>';
+    }
+    $output .= '</ul>';
+  }
+
+  return $output;
+}
+
+/**
+ * Implements hook_admin().
+ */
+function things_recently_viewed_admin() {
+  $form = array();
+
+  $form['things_recently_viewed_max'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum number of links'),
+    '#default_value' => variable_get('things_recently_viewed_max', 3),
+    '#size' => 2,
+    '#maxlength' => 2,
+    '#description' => t("The max number of links to display in the block."),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_menu().
+ */
+function things_recently_viewed_menu() {
+
+  $items = array();
+
+  $items['admin/settings/things-recently-viewed'] = array(
+    'title' => 'Things Recently Viewed module settings',
+    'description' => 'Config settings for Things Recently Viewed Module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('things_recently_viewed_admin'),
+    'access arguments' => array('administer onthisdate settings'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}

@@ -1,0 +1,3 @@
+name = Things Recently Viewed
+description = Shows recently viewed nodes in descending order.
+core = 7.x
